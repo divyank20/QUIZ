@@ -3,107 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MockBuddy — AIIMS Paramedical PYQ Quiz</title>
+<title>MockBuddy — AIIMS Paramedical</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: #2a2a3a; --accent: #6c63ff; --accent2: #ff6584; --green: #43e97b; --red: #ff4d6d; --yellow: #ffd166; --text: #f0f0ff; --muted: #8888aa; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  #splash { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; background: radial-gradient(ellipse at 50% 0%, #1a1535 0%, var(--bg) 70%); }
-  .logo { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #6c63ff, #ff6584); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.3rem; }
-  .start-btn { background: linear-gradient(135deg, #6c63ff, #8b5cf6); border: none; color: white; font-family: 'Syne', sans-serif; font-size: 1.1rem; padding: 1rem 3rem; border-radius: 12px; cursor: pointer; }
-  #quiz, #paywall, #pending, #result, #adminPanel { display: none; }
-  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1.8rem; margin: 1rem auto; max-width: 700px; }
-  .option-btn { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text); padding: 0.85rem 1.2rem; border-radius: 12px; margin-bottom: 0.7rem; width: 100%; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
-  .option-btn.correct { border-color: var(--green); background: rgba(67,233,123,0.1); }
-  .option-btn.wrong { border-color: var(--red); background: rgba(255,77,109,0.1); }
-  .btn { padding: 0.7rem 1.5rem; border-radius: 10px; border: none; font-family: 'Syne', sans-serif; cursor: pointer; }
-  .btn-primary { background: var(--accent); color: white; }
+  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: #2a2a3a; --accent: #6c63ff; --accent2: #ff6584; --green: #43e97b; --red: #ff4d6d; --text: #f0f0ff; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  #splash, #quiz, #paywall { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1.5rem; width: 100%; max-width: 500px; }
+  .btn { padding: 1rem 2rem; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; color: white; background: var(--accent); }
 </style>
 </head>
 <body>
 
 <div id="splash">
-  <div class="logo">MockBuddy</div>
-  <p style="color:var(--muted); margin-bottom:2rem;">AIIMS Paramedical PYQ Practice</p>
-  <button class="start-btn" onclick="startQuiz()">Start Mock Test →</button>
+  <h1 style="font-family:'Syne'; font-size:3rem; margin-bottom:1rem;">MockBuddy</h1>
+  <button class="btn" onclick="startQuiz()">Start Mock Test</button>
 </div>
 
-<div id="quiz" style="padding:1rem;">
-  <div class="q-card">
-    <div id="qNum" style="margin-bottom:10px;">Q 1 / 90</div>
-    <div id="qText" style="font-size:1.2rem; margin-bottom:20px;"></div>
-    <div id="options"></div>
-    <div id="explanation" style="margin-top:15px; font-size:0.9rem; display:none;"></div>
-    <div style="margin-top:20px;">
-        <button id="nextBtn" class="btn btn-primary" onclick="nextQ()" style="display:none;">Next Question →</button>
+<div id="quiz" style="display:none;">
+    <div class="q-card">
+        <div id="qText" style="margin-bottom:20px; font-size:1.2rem;"></div>
+        <div id="options" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
-  </div>
 </div>
 
-<div id="paywall" style="display:none; padding:2rem; justify-content:center;">
-  <div class="q-card" style="max-width:400px; text-align:center;">
-    <h2 style="font-family:'Syne'; margin-bottom:1rem;">Manual Payment</h2>
-    <div style="background:var(--surface2); padding:1rem; border-radius:10px; margin-bottom:1rem;">
+<div id="paywall" style="display:none; text-align:center;">
+    <div class="q-card">
+        <h2>Manual Payment</h2>
         <p>Aapka Unique Code:</p>
-        <h1 id="userRefCode" style="color:var(--accent); font-size:2rem; margin:10px 0;"></h1>
-        <p style="font-size:0.8rem;">UPI: <b>mockbuddy@upi</b></p>
+        <h1 id="userRefCode" style="color:var(--accent);"></h1>
+        <input type="text" id="pName" placeholder="Naam" style="width:100%; padding:10px; margin:10px 0; background:#000; color:#fff;">
+        <input type="text" id="pTxn" placeholder="UTR/Transaction ID" style="width:100%; padding:10px; margin:10px 0; background:#000; color:#fff;">
+        <button class="btn" onclick="finish()">Submit Payment</button>
     </div>
-    <input type="text" id="payName" placeholder="Aapka Naam" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;"><br>
-    <input type="text" id="payTxn" placeholder="Transaction ID (UTR)" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;"><br>
-    <button class="btn btn-primary" style="width:100%" onclick="submitPayment()">Submit Verification</button>
-  </div>
 </div>
 
 <script>
-const CONFIG = { UPI_ID: "mockbuddy@upi", FREE_QUESTIONS: 5, ADMIN_SECRET: "admin123" };
 const ALL_QUESTIONS =[
   {year:"2022",subject:"Physics",q:"The magnitude of resultant of three unit vectors can be:",opts:["Zero","3","1","All of these"],ans:3,exp:"Three unit vectors can give resultant of any magnitude from 0 to 3."},
-  // ... (BAKI SARE QUESTIONS YAHI RAHENGE)
+  {year:"2022",subject:"Physics",q:"If energy (E), velocity (v) and force (F) are taken as fundamental quantities, then dimensions of mass are:",opts:["FV⁻²","EV⁻²","FV⁻¹","EV³"],ans:0,exp:"Mass = Force/Acceleration = F/(v/t)."},
+  {year:"2022",subject:"Physics",q:"If a car covers 2/5th of total distance with v₁ speed and 3/5th with v₂, then average speed is:",opts:["5v₁v₂ / (v₁+v₂)","√(v₁v₂)","(v₁+v₂)/2","5v₁v₂ / (3v₁+2v₂)"],ans:3,exp:"Average speed = Total distance / Total time."},
+  {year:"2022",subject:"Physics",q:"A body executes SHM with amplitude A. At what displacement from mean position is potential energy one-fourth of total energy?",opts:["5A/2","A/2","A/6","None of these"],ans:1,exp:"PE = ½kx² = Total E/4."},
+  {year:"2022",subject:"Physics",q:"A parallel plate air capacitor is charged. After disconnecting battery, distance between plates is decreased. Potential difference:",opts:["Decreases","Increases","Does not change","Becomes zero"],ans:0,exp:"Q is constant, C increases, V=Q/C so V decreases."},
+  {year:"2022",subject:"Physics",q:"For a uniformly charged sphere, the electric field from its centre:",opts:["Increases linearly upto the surface","Decreases linearly upto the surface","First increases then decreases upto surface","Remains zero upto the surface"],ans:0,exp:"E ∝ r inside a solid sphere."},
+  {year:"2022",subject:"Physics",q:"In a double slit experiment, light of wavelength 5000 Å gives fringe width 1mm. If λ = 6000 Å is used without altering the system, new fringe width is:",opts:["2.1 mm","12 mm","1.2 mm","0.2 mm"],ans:2,exp:"β ∝ λ."},
+  {year:"2022",subject:"Physics",q:"A satellite is taken from orbital radius 2R to 3R. Minimum work done is:",opts:["GMm/5R","GMm/12R","GMm/21R","GMm/2R"],ans:1,exp:"Work = ΔPE."},
+  {year:"2022",subject:"Physics",q:"For coherent sources, which is essential?",opts:["v different","Δφ constant","Different amplitude","Amplitude same"],ans:1,exp:"Constant phase difference."},
+  {year:"2022",subject:"Physics",q:"Critical angle of light passing from glass to air is maximum for:",opts:["Red","Violet","Green","Yellow"],ans:0,exp:"μ is least for red."},
+  {year:"2022",subject:"Chemistry",q:"Mixture of acetone and methyl alcohol can be separated by:",opts:["Sublimation","Fractional distillation","Simple distillation","Chromatography"],ans:1,exp:"Fractional distillation."},
+  {year:"2022",subject:"Chemistry",q:"Most reactive towards E.S.R.:",opts:["Chloro Benzene","Nitro Benzene","Phenyl Acetate","Benzene"],ans:2,exp:"Phenyl Acetate activates the ring."},
+  {year:"2022",subject:"Chemistry",q:"Benzene + Acetylchloride → (AlCl₃) → product. Name of above reaction is:",opts:["Gattermann reaction","Shotten Baumann reaction","Friedel Craft reaction","Wurtz Fittig reaction"],ans:2,exp:"Friedel-Crafts acylation."},
+  {year:"2022",subject:"Chemistry",q:"Blue baby syndrome is caused by excess of:",opts:["F⁻","NO₃⁻","SO₄²⁻","None of these"],ans:1,exp:"Nitrate excess."},
+  {year:"2022",subject:"Chemistry",q:"Which order for atomic radii is wrong?",opts:["O²⁻ > F > Na⁺ > Mg²⁺","H⁻ > Li⁺ ≥ Mg²⁺ > Al³⁺","MnO₄ > KMnO₄","B > Al ≃ Ga < In ≃ Tl"],ans:2,exp:"Cannot compare directly."},
+  {year:"2022",subject:"Chemistry",q:"Milk of magnesia is:",opts:["Suspension of Mg(OH)₂ in water","Pure Mg(OH)₂","Colloid of Mg(OH)₂ in water","True solution of Mg(OH)₂"],ans:0,exp:"Suspension."},
+  {year:"2022",subject:"Chemistry",q:"The law of multiple proportion is illustrated by:",opts:["Caustic soda and caustic potash","Sodium chloride and sodium bromide","Ordinary water and heavy water","Sulphur dioxide and sulphur trioxide"],ans:3,exp:"SO₂ and SO₃."},
+  {year:"2022",subject:"Chemistry",q:"The oxidation number of 'P' in Mg₂P₃O₇ is:",opts:["-5","+6","+5","+8"],ans:2,exp:"Standard oxidation state."},
+  {year:"2022",subject:"Chemistry",q:"The solubility product of AgCl is 1.5625 × 10⁻¹⁰ at 25°C. Its solubility in gram per litre will be:",opts:["1.79 × 10⁻⁸","179","17","1.79 × 10⁻³"],ans:3,exp:"Ksp = s²."},
+  {year:"2022",subject:"Chemistry",q:"Which complex has highest paramagnetism?",opts:["[Cu(H₂O)₆]²⁺","[Fe(H₂O)₆]²⁺","[Zn(H₂O)₆]²⁺","[Cr(H₂O)₆]³⁺"],ans:1,exp:"Fe²⁺ has 4 unpaired electrons."},
+  {year:"2022",subject:"Biology",q:"Haemophilic man marries a normal woman. Their offspring will be:",opts:["All girls haemophilic","All haemophilic","All boys haemophilic","All normal"],ans:3,exp:"All appear normal."},
+  {year:"2022",subject:"Biology",q:"In human beings 45 chromosomes/single X/XO abnormality causes which syndrome?",opts:["Klinefelter's syndrome","Edward's syndrome","Turner's syndrome","Down's syndrome"],ans:2,exp:"Turner's syndrome."},
+  {year:"2022",subject:"Biology",q:"Which one is a hereditary disease?",opts:["Leprosy","Blindness","Cataract","Phenylketonuria"],ans:3,exp:"PKU."},
+  {year:"2022",subject:"Biology",q:"An example of endomycorrhiza is:",opts:["Nostoc","Glomus","Rhizobium","Agaricus"],ans:1,exp:"Glomus."},
+  {year:"2022",subject:"Biology",q:"Which body regulates GM research and safety in India?",opts:["Genetic Engineering Approval Committee","Indian Council of Agricultural Research","Research Committee on Genetic Manipulation","Bio-safety committee"],ans:0,exp:"GEAC."},
+  {year:"2022",subject:"Biology",q:"Brush border columnar epithelium is found in:",opts:["Gall bladder","Epididymis","Stomach","Intestine"],ans:3,exp:"Intestine."},
+  {year:"2022",subject:"Biology",q:"Renin hormone is released by:",opts:["Kidney","Ovary","Heart","ADH"],ans:0,exp:"Kidney."},
+  {year:"2022",subject:"Biology",q:"Which would appear as pioneer organism on bare rocks?",opts:["Lichens","Green algae","Mosses","Liverworts"],ans:0,exp:"Lichens."},
+  {year:"2022",subject:"Biology",q:"Which one of the following is the starter codon?",opts:["AUG","UAG","UAA","UGA"],ans:0,exp:"AUG."},
+  {year:"2022",subject:"Biology",q:"Dark reactions of photosynthesis occur in:",opts:["Periplastidial space","Granal thylakoid membranes","Stroma outside photosynthetic lamellae","Stromal lamella membranes"],ans:2,exp:"Stroma."},
+  {year:"2023",subject:"Physics",q:"Which of the following is a vector quantity?",opts:["Work","Current","Power","Velocity"],ans:3,exp:"Velocity."},
+  {year:"2023",subject:"Physics",q:"If the distance covered is zero, the displacement:",opts:["Must be zero","Depends upon the particle","May or may not be zero","Cannot be zero"],ans:0,exp:"Must be zero."},
+  {year:"2023",subject:"Physics",q:"A galvanometer can be converted to a voltmeter by connecting:",opts:["A high resistance in series","A low resistance in parallel","A high resistance in parallel","A low resistance in series"],ans:0,exp:"High resistance in series."},
+  {year:"2023",subject:"Physics",q:"Series LCR circuit is also called:",opts:["Acceptor circuit","Both (a) and (b)","Rejecting circuit","Avoiding circuit"],ans:0,exp:"Acceptor circuit."},
+  {year:"2023",subject:"Physics",q:"Which of the following has the least wavelength?",opts:["X-rays","Ultraviolet rays","Radio waves","Microwaves"],ans:0,exp:"X-rays."},
+  {year:"2023",subject:"Physics",q:"Energy gap of 0.7 eV — the material is:",opts:["Semimetal","An insulator","Semiconductor","A conductor"],ans:2,exp:"Semiconductor."},
+  {year:"2023",subject:"Physics",q:"Colour of light having maximum speed in glass is:",opts:["Yellow","Red","Same for all","Violet"],ans:1,exp:"Red."},
+  {year:"2023",subject:"Physics",q:"Reverse phenomenon of X-ray production is:",opts:["None","Photoelectric effect","X-ray absorption","Compton effect"],ans:1,exp:"Photoelectric effect."},
+  {year:"2023",subject:"Physics",q:"The force of cohesion is maximum in:",opts:["Solid","All","Liquids","Gases"],ans:0,exp:"Solid."},
+  {year:"2023",subject:"Physics",q:"Rainbow is formed due to:",opts:["Diffraction","Reflection","Refraction","Interference"],ans:2,exp:"Refraction."},
+  {year:"2023",subject:"Chemistry",q:"In the given compound which one is not isoelectronic species?",opts:["N³⁻","CN⁻","Na⁺","O²⁻"],ans:2,exp:"Na+ differ."},
+  {year:"2023",subject:"Chemistry",q:"[Ni(CN)₄]²⁻ and [CoFe]³⁺ complex geometry is:",opts:["Tetrahedral and octahedral","Square Planar and octahedral","Tetrahedral and often square pyramidal","Square Planar and Square Planar"],ans:1,exp:"Square Planar and Octahedral."},
+  {year:"2023",subject:"Chemistry",q:"A hydrocarbon X (V.D.=35) forms only one monochloro substitution product. X is:",opts:["Neopentane","Cyclopentane","Pent-1-ene","n-pentane"],ans:0,exp:"Neopentane."},
+  {year:"2023",subject:"Chemistry",q:"What is the hybridization of C1 and C2 in benzene-CH=CH-C≡CH?",opts:["sp³, sp²","sp², sp²","sp, sp","sp², sp"],ans:3,exp:"sp², sp."},
+  {year:"2023",subject:"Chemistry",q:"Resonance hybrids are:",opts:["Inherently unstable","More stable than any individual resonance form","Averages resembling less stable forms","Averages resembling the more stable forms"],ans:3,exp:"Weighted average."},
+  {year:"2023",subject:"Chemistry",q:"Which molecule has nonzero dipole moment?",opts:["Cl₂","CO₂","CCl₄","CHCl₃"],ans:3,exp:"CHCl₃."},
+  {year:"2023",subject:"Chemistry",q:"MnO₄⁻ changes into Mn²⁺. Charge transfer (1F = 96500):",opts:["96500","282000","482500","289500"],ans:2,exp:"5 × 96500."},
+  {year:"2023",subject:"Chemistry",q:"a = b ≠ c and α = β = 90°, γ = 120° type of crystal system is:",opts:["Tetrahedral","Hexagonal","Triclinic","Cubic"],ans:1,exp:"Hexagonal."},
+  {year:"2023",subject:"Chemistry",q:"Toluene reacts with Cl₂ in presence of light to give:",opts:["Benzyl chloride","Benzoyl chloride","p-chlorotoluene","o-chlorotoluene"],ans:0,exp:"Benzyl chloride."},
+  {year:"2023",subject:"Chemistry",q:"Which of following compounds have planar molecules?",opts:["Ethyl alcohol","Formaldehyde","Diethyl ether","1,3-butadiene"],ans:1,exp:"Formaldehyde."},
+  {year:"2023",subject:"Biology",q:"Organisms living in salty areas are called as:",opts:["Methanogens","Halophiles","Heliophytes","Thermoacidophiles"],ans:1,exp:"Halophiles."},
+  {year:"2023",subject:"Biology",q:"Cyanobacteria are classified under:",opts:["Protista","Plantae","Monera","Algae"],ans:2,exp:"Monera."},
+  {year:"2023",subject:"Biology",q:"Which one of the following is oviparous?",opts:["Platypus","Flying fox (bat)","Elephant","Whale"],ans:0,exp:"Platypus."},
+  {year:"2023",subject:"Biology",q:"The placenta is attached to the developing seed near the:",opts:["Testa","Hilum","Micropyle","Chalaza"],ans:1,exp:"Hilum."},
+  {year:"2023",subject:"Biology",q:"The form of sugar transported through phloem is:",opts:["Glucose","Fructose","Sucrose","Ribose"],ans:2,exp:"Sucrose."},
+  {year:"2023",subject:"Biology",q:"Which metal ion is a constituent of chlorophyll?",opts:["Iron","Copper","Magnesium","Zinc"],ans:2,exp:"Magnesium."},
+  {year:"2023",subject:"Biology",q:"WOF — steps in transcription catalysed by RNA polymerase:",opts:["Initiation","Elongation","Termination","All of the above"],ans:3,exp:"All of the above."},
+  {year:"2023",subject:"Biology",q:"Chemical test used for diagnosis of typhoid is:",opts:["Elisa","Esr","Per","Widal"],ans:3,exp:"Widal."},
+  {year:"2023",subject:"Biology",q:"ZZ/ZW type of sex determination is seen in:",opts:["Platypus","Snails","Cockroach","Peacock"],ans:3,exp:"Peacock."},
+  {year:"2023",subject:"Biology",q:"ABA acts antagonistic to:",opts:["Ethylene","Cytokinin","Gibberellic acid","IAA"],ans:2,exp:"Gibberellic acid."},
+  {year:"2025",subject:"Physics",q:"The dimensional formula of electric potential (voltage) is:",opts:["ML²T⁻²I⁻¹","ML²T⁻³I⁻¹","MLT⁻³I⁻¹","ML²T⁻¹I⁻²"],ans:1,exp:"Work/Charge."},
+  {year:"2025",subject:"Physics",q:"Moment of inertia of solid sphere of mass M radius R about its diameter is:",opts:["(2/5)MR²","(3/5)MR²","(5/2)MR²","MR²"],ans:0,exp:"Standard formula."},
+  {year:"2025",subject:"Physics",q:"Excess pressure inside liquid drop of radius R and surface tension S is:",opts:["S/R","3S/R","2S/R","4S/R"],ans:2,exp:"2S/R."},
+  {year:"2025",subject:"Physics",q:"Electron and proton have same KE — ratio of de-Broglie wavelengths:",opts:["1","10","43","1836"],ans:2,exp:"√1836."},
+  {year:"2025",subject:"Physics",q:"Current changes 4A to 0A in 0.5s, induced EMF = 120V. Self-inductance is:",opts:["10 H","12 H","15 H","20 H"],ans:2,exp:"15 H."},
+  {year:"2025",subject:"Physics",q:"Magnetic field at centre of circular loop radius R carrying current I:",opts:["μ₀I/2πR","μ₀I/2R","μ₀IR/2","μ₀I/R"],ans:1,exp:"μ₀I/2R."},
+  {year:"2025",subject:"Physics",q:"Energy loss in a transformer can be reduced by:",opts:["Using thin wire","Increasing voltage","Using thick copper wire","Increasing resistance"],ans:2,exp:"Thick copper wire."},
+  {year:"2025",subject:"Chemistry",q:"Correct melting point order of dichlorobenzene isomers:",opts:["1,2 < 1,3 < 1,4","1,4 < 1,2 < 1,3","1,2 < 1,4 < 1,3","1,3 < 1,2 < 1,4"],ans:3,exp:"1,3 < 1,2 < 1,4."},
+  {year:"2025",subject:"Chemistry",q:"Benzaldehyde reacts with conc. NaOH to give:",opts:["Benzyl alcohol","Sodium benzoate","Phenol","Benzyl alcohol and sodium benzoate"],ans:3,exp:"Cannizzaro reaction."},
+  {year:"2025",subject:"Chemistry",q:"Which enzyme converts glucose and fructose both into ethanol?",opts:["Invertase","Zymase","Maltase","Diastase"],ans:1,exp:"Zymase."},
+  {year:"2025",subject:"Chemistry",q:"Chemical name of Vitamin B6 is:",opts:["Biotin","Thiamine","Riboflavin","Pyridoxine"],ans:3,exp:"Pyridoxine."},
+  {year:"2025",subject:"Chemistry",q:"Correct order of basic strength among Group 15 hydrides:",opts:["BiH₃ > SbH₃ > AsH₃ > PH₃ > NH₃","NH₃ > PH₃ > AsH₃ > SbH₃ > BiH₃","NH₃ < PH₃ < AsH₃ < SbH₃ < BiH₃","PH₃ > NH₃ > AsH₃ > SbH₃ > BiH₃"],ans:1,exp:"NH₃ is strongest base."},
+  {year:"2025",subject:"Chemistry",q:"Which of the following is Hinsberg reagent?",opts:["C₆H₅SO₂CH₃","SnCl₂","C₆H₅SO₂Cl","CoCl₂"],ans:2,exp:"C₆H₅SO₂Cl."},
+  {year:"2025",subject:"Chemistry",q:"A reaction will proceed in direction of products when:",opts:["Qc = Kc","Qc > Kc","Qc < Kc","Qc = 0"],ans:2,exp:"Qc < Kc."},
+  {year:"2025",subject:"Chemistry",q:"Amorphous substances show:",opts:["Isotropic properties","Short range order","Long range order","Sharp melting point"],ans:0,exp:"Isotropic."},
+  {year:"2025",subject:"Biology",q:"Mendel prevented self-pollination using technique of:",opts:["Bagging","Pollination","Emasculation","Cloning"],ans:2,exp:"Emasculation."},
+  {year:"2025",subject:"Biology",q:"Adaptive radiation is an example of:",opts:["Convergent evolution","Parallel evolution","Divergent evolution","Co-evolution"],ans:2,exp:"Divergent evolution."},
+  {year:"2025",subject:"Biology",q:"Hardy-Weinberg principle explains:",opts:["Mutation rate","Genetic equilibrium in a population","Speciation","Natural selection only"],ans:1,exp:"Genetic equilibrium."},
+  {year:"2025",subject:"Biology",q:"Beginning of menstrual cycle in human females is known as:",opts:["Ovulation","Menopause","Menarche","Fertilisation"],ans:2,exp:"Menarche."},
+  {year:"2025",subject:"Biology",q:"Angiosperms were classified based on natural system by:",opts:["Linnaeus","Whittaker","Bentham and Hooker","Engler and Prantl"],ans:2,exp:"Bentham and Hooker."},
+  {year:"2025",subject:"Biology",q:"Starch sheath is a characteristic feature of:",opts:["Epidermis of leaf","Endodermis of dicot stem","Pericycle of root","Cortex of monocot stem"],ans:1,exp:"Endodermis of dicot stem."},
+  {year:"2025",subject:"Biology",q:"Vexillary aestivation is commonly seen in:",opts:["Solanaceae","Liliaceae","Fabaceae","Poaceae"],ans:2,exp:"Fabaceae."},
+  {year:"2025",subject:"Biology",q:"Platelets are produced from which cells in bone marrow?",opts:["Erythrocytes","Monocytes","Megakaryocytes","Lymphocytes"],ans:2,exp:"Megakaryocytes."},
+  {year:"2025",subject:"Biology",q:"Auxin is chemically derived from:",opts:["Adenine","Cytokinin","Indole-3-acetic acid","Gibberellic acid"],ans:2,exp:"IAA."},
+  {year:"2025",subject:"Biology",q:"Incorrect statement about Solanaceae floral formula:",opts:["Actinomorphic flower","Bisexual flower","Superior ovary","Inferior ovary"],ans:3,exp:"Solanaceae has superior ovary."},
+  {year:"2024",subject:"Biology",q:"Inner wall of microsporangia is:",opts:["Tapetum","Epidermis","Endothecium","Middle layer"],ans:0,exp:"Tapetum."},
+  {year:"2024",subject:"Biology",q:"Which hormone is NOT synthesized by anterior pituitary gland?",opts:["Prolactin","Vasopressin","LH","FSH"],ans:1,exp:"Vasopressin."},
+  {year:"2024",subject:"Biology",q:"Pneumotaxic center is present in:",opts:["Cerebellum","Cerebrum","Pons","Medulla"],ans:2,exp:"Pons."},
+  {year:"2024",subject:"Biology",q:"PS I first wavelength/reaction center is:",opts:["Chl-680","Chl-700","Chl-660","Chl-760"],ans:1,exp:"Chl-700."},
+  {year:"2024",subject:"Biology",q:"Which fruit has fibrous mesocarp?",opts:["Apple","Coconut","Strawberry","Mango"],ans:1,exp:"Coconut."},
+  {year:"2024",subject:"Biology",q:"In commensalism, two organisms have:",opts:["Benefit to both","Harm to both","Benefit to one and harm to other","Benefit to one and neither harm nor benefit to other"],ans:3,exp:"Benefit to one, no harm to other."},
+  {year:"2024",subject:"Biology",q:"Chiasmata formation occurs during which sub-stage of meiosis?",opts:["Pachytene","Diplotene","Leptotene","Zygotene"],ans:1,exp:"Diplotene."},
+  {year:"2024",subject:"Biology",q:"Androgen is secreted by which cells?",opts:["Sertoli Cell","Leydig Cell","Follicle Cell","Nurse Cell"],ans:1,exp:"Leydig Cell."},
+  {year:"2024",subject:"Biology",q:"Which of the following is NOT a sexually transmitted disease (STD)?",opts:["Hepatitis B","Syphilis","Gonorrhea","Ascariasis"],ans:3,exp:"Ascariasis."},
+  {year:"2024",subject:"Biology",q:"Which statement about ammonia excretion is FALSE?",opts:["Kidney does not excrete ammonia","More water is required for ammonia excretion","Ammonia is more toxic substance","Ammonia is converted into urea"],ans:0,exp:"Kidney does excrete ammonia."},
+  {year:"2024",subject:"Chemistry",q:"Water-gas chemical formula is:",opts:["CO₂ + H₂O","CO + H₂","SO₂ + CO₂ + Heat","CO + H₂O₂"],ans:1,exp:"CO + H₂."},
+  {year:"2024",subject:"Chemistry",q:"Which of the following shows ferrimagnetism?",opts:["TiO₂","CrO₂","MnO","Fe₃O₄"],ans:3,exp:"Fe₃O₄."},
+  {year:"2024",subject:"Chemistry",q:"Conjugate base of HSO₄⁻ is:",opts:["SO₄²⁻","H₂SO₃","OH⁻","H₂SO₄"],ans:0,exp:"SO₄²⁻."},
+  {year:"2024",subject:"Chemistry",q:"Which hydrogen atom series lies in visible region?",opts:["Paschen series","Balmer series","Lyman series","Brackett series"],ans:1,exp:"Balmer series."},
+  {year:"2024",subject:"Chemistry",q:"Physical adsorption — point out WRONG statement:",opts:["Attraction due to weak Van der Waal's forces","Irreversible nature of adsorption","Multimolecular adsorption layers","Decrease in adsorption with increase in temperature"],ans:1,exp:"Reversible."},
+  {year:"2024",subject:"Chemistry",q:"Which has higher dipole moment — NH₃ or NF₃?",opts:["NH₃","NF₃","Both equal","None of above"],ans:0,exp:"NH₃."},
+  {year:"2024",subject:"Chemistry",q:"IUPAC name of complex [CoCl₂(en)₂]Cl is:",opts:["Dichloridobis(ethane-1,2-diamine)cobalt(III) chloride","Dichloridobis(ethane-2,1-diamine)cobalt(III) chloride","Dichloridobis(ethylenediamine)cobalt(III) chloride","Bis(ethylenediamine)cobalt(III) chloride"],ans:0,exp:"IUPAC name."},
+  {year:"2024",subject:"Physics",q:"Object placed 10cm in front of concave mirror (f=20cm). Magnification is:",opts:["1","2","0.5","-2"],ans:1,exp:"m=+2."},
+  {year:"2024",subject:"Physics",q:"If L = 40mH, C = 100μF, angular frequency ω at resonance is:",opts:["400","100","500","250"],ans:2,exp:"500 rad/s."},
+  {year:"2024",subject:"Physics",q:"Molar specific heat Cv of diatomic gas with vibrational degree of freedom:",opts:["5R/2","6R/2","7R/2","9R/2"],ans:2,exp:"7R/2."},
+  {year:"2024",subject:"Physics",q:"Inelastic collision: m₁=1kg, m₂=3kg, u₁=2m/s, u₂=0. Change in KE (ΔK) is:",opts:["1.0 J","1.2 J","1.5 J","2.0 J"],ans:2,exp:"1.5 J."},
+  {year:"2024",subject:"Physics",q:"Angular momentum of electron in hydrogen atom if n=2:",opts:["h/2π","2h/π","2h/2π","nh/2π"],ans:2,exp:"h/π."}
 ];
 
-// GENERATE UNIQUE CODE
-const myRef = "MB-" + Math.floor(100000 + Math.random() * 900000);
-document.getElementById('userRefCode').textContent = myRef;
-
+const refCode = "MB-" + Math.floor(100000 + Math.random() * 900000);
+document.getElementById('userRefCode').textContent = refCode;
 let current = 0;
-let isPaid = localStorage.getItem('mb_paid') === 'true';
 
 function startQuiz() {
     document.getElementById('splash').style.display = 'none';
-    document.getElementById('quiz').style.display = 'block';
+    document.getElementById('quiz').style.display = 'flex';
     renderQ();
 }
 
 function renderQ() {
     let q = ALL_QUESTIONS[current];
-    document.getElementById('qNum').textContent = "Q " + (current + 1);
     document.getElementById('qText').textContent = q.q;
-    let optHtml = "";
-    q.opts.forEach((o, i) => {
-        optHtml += `<button class="option-btn" onclick="selectAns(${i})">${o}</button>`;
-    });
-    document.getElementById('options').innerHTML = optHtml;
-}
-
-function selectAns(idx) {
-    if(!isPaid && current >= CONFIG.FREE_QUESTIONS) {
-        document.getElementById('quiz').style.display = 'none';
-        document.getElementById('paywall').style.display = 'flex';
-        return;
-    }
-    // Simple logic: Next button dikhao
-    document.getElementById('nextBtn').style.display = 'block';
+    let html = "";
+    q.opts.forEach((o, i) => html += `<button class="btn" onclick="nextQ()">${o}</button>`);
+    document.getElementById('options').innerHTML = html;
 }
 
 function nextQ() {
     current++;
-    if(current >= ALL_QUESTIONS.length) { alert("Quiz Finished!"); return; }
-    renderQ();
-    document.getElementById('nextBtn').style.display = 'none';
+    if(current >= 5) { // 5 questions ke baad paywall
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('paywall').style.display = 'flex';
+    } else { renderQ(); }
 }
 
-function submitPayment() {
-    let name = document.getElementById('payName').value;
-    let txn = document.getElementById('payTxn').value;
-    let requests = JSON.parse(localStorage.getItem('mb_requests') || '
+function finish() { alert("Verification request bheji gayi!"); }
+</script>
+</body>
+</html>
