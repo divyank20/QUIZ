@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MockBuddy — AIIMS Paramedical PYQ Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: #2a2a3a; --accent: #6c63ff; --accent2: #ff6584; --green: #43e97b; --red: #ff4d6d; --yellow: #ffd166; --text: #f0f0ff; --muted: #8888aa; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  #splash { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; background: radial-gradient(ellipse at 50% 0%, #1a1535 0%, var(--bg) 70%); }
+  .logo { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #6c63ff, #ff6584); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.3rem; }
+  .start-btn { background: linear-gradient(135deg, #6c63ff, #8b5cf6); border: none; color: white; font-family: 'Syne', sans-serif; font-size: 1.1rem; padding: 1rem 3rem; border-radius: 12px; cursor: pointer; }
+  #quiz, #paywall, #pending, #result, #adminPanel { display: none; }
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1.8rem; margin: 1rem auto; max-width: 700px; }
+  .option-btn { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text); padding: 0.85rem 1.2rem; border-radius: 12px; margin-bottom: 0.7rem; width: 100%; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
+  .option-btn.correct { border-color: var(--green); background: rgba(67,233,123,0.1); }
+  .option-btn.wrong { border-color: var(--red); background: rgba(255,77,109,0.1); }
+  .btn { padding: 0.7rem 1.5rem; border-radius: 10px; border: none; font-family: 'Syne', sans-serif; cursor: pointer; }
+  .btn-primary { background: var(--accent); color: white; }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo">MockBuddy</div>
+  <p style="color:var(--muted); margin-bottom:2rem;">AIIMS Paramedical PYQ Practice</p>
+  <button class="start-btn" onclick="startQuiz()">Start Mock Test →</button>
+</div>
+
+<div id="quiz" style="padding:1rem;">
+  <div class="q-card">
+    <div id="qNum" style="margin-bottom:10px;">Q 1 / 90</div>
+    <div id="qText" style="font-size:1.2rem; margin-bottom:20px;"></div>
+    <div id="options"></div>
+    <div id="explanation" style="margin-top:15px; font-size:0.9rem; display:none;"></div>
+    <div style="margin-top:20px;">
+        <button id="nextBtn" class="btn btn-primary" onclick="nextQ()" style="display:none;">Next Question →</button>
+    </div>
+  </div>
+</div>
+
+<div id="paywall" style="display:none; padding:2rem; justify-content:center;">
+  <div class="q-card" style="max-width:400px; text-align:center;">
+    <h2 style="font-family:'Syne'; margin-bottom:1rem;">Manual Payment</h2>
+    <div style="background:var(--surface2); padding:1rem; border-radius:10px; margin-bottom:1rem;">
+        <p>Aapka Unique Code:</p>
+        <h1 id="userRefCode" style="color:var(--accent); font-size:2rem; margin:10px 0;"></h1>
+        <p style="font-size:0.8rem;">UPI: <b>mockbuddy@upi</b></p>
+    </div>
+    <input type="text" id="payName" placeholder="Aapka Naam" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;"><br>
+    <input type="text" id="payTxn" placeholder="Transaction ID (UTR)" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;"><br>
+    <button class="btn btn-primary" style="width:100%" onclick="submitPayment()">Submit Verification</button>
+  </div>
+</div>
+
+<script>
+const CONFIG = { UPI_ID: "mockbuddy@upi", FREE_QUESTIONS: 5, ADMIN_SECRET: "admin123" };
+const ALL_QUESTIONS =[
+  {year:"2022",subject:"Physics",q:"The magnitude of resultant of three unit vectors can be:",opts:["Zero","3","1","All of these"],ans:3,exp:"Three unit vectors can give resultant of any magnitude from 0 to 3."},
+  // ... (BAKI SARE QUESTIONS YAHI RAHENGE)
+];
+
+// GENERATE UNIQUE CODE
+const myRef = "MB-" + Math.floor(100000 + Math.random() * 900000);
+document.getElementById('userRefCode').textContent = myRef;
+
+let current = 0;
+let isPaid = localStorage.getItem('mb_paid') === 'true';
+
+function startQuiz() {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    renderQ();
+}
+
+function renderQ() {
+    let q = ALL_QUESTIONS[current];
+    document.getElementById('qNum').textContent = "Q " + (current + 1);
+    document.getElementById('qText').textContent = q.q;
+    let optHtml = "";
+    q.opts.forEach((o, i) => {
+        optHtml += `<button class="option-btn" onclick="selectAns(${i})">${o}</button>`;
+    });
+    document.getElementById('options').innerHTML = optHtml;
+}
+
+function selectAns(idx) {
+    if(!isPaid && current >= CONFIG.FREE_QUESTIONS) {
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('paywall').style.display = 'flex';
+        return;
+    }
+    // Simple logic: Next button dikhao
+    document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQ() {
+    current++;
+    if(current >= ALL_QUESTIONS.length) { alert("Quiz Finished!"); return; }
+    renderQ();
+    document.getElementById('nextBtn').style.display = 'none';
+}
+
+function submitPayment() {
+    let name = document.getElementById('payName').value;
+    let txn = document.getElementById('payTxn').value;
+    let requests = JSON.parse(localStorage.getItem('mb_requests') || '
